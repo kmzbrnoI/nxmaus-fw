@@ -1,7 +1,7 @@
 #include <avr/io.h>
 
 #ifndef BAUD
-#define BAUD 9600
+#define BAUD 62500
 #endif
 #include <util/setbaud.h>
 
@@ -22,8 +22,8 @@ void uart_init(void) {
 	UCSR0A &= ~(_BV(U2X0));
 #endif
 
-	UCSR0C = _BV(UCSZ01) | _BV(UCSZ00); /* 8-bit data */
-	UCSR0B = _BV(RXEN0) | _BV(TXEN0);   /* Enable RX and TX */
+	UCSR0C = _BV(UCSZ01) | _BV(UCSZ00); // 9-bit data
+	UCSR0B = _BV(RXCIE0) | _BV(TXCIE0) | _BV(UCSZ02) | _BV(RXEN0) | _BV(TXEN0);  // RX, TX enable; RT, TX interrupt enable
 }
 
 void uart_putchar(char c) {
