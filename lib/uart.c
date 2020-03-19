@@ -29,11 +29,11 @@ void (*uart_on_receive)(uint8_t recipient, uint8_t *data, uint8_t size) = NULL;
 
 void send_next_byte();
 void _uart_send_buf();
-void _uart_received_ninth(uint8_t data);
-void _uart_received_non_ninth(uint8_t data);
-bool _parity_ok(uint8_t data);
-uint8_t _message_len(uint8_t header_byte);
-void _check_addr_conflict();
+static inline void _uart_received_ninth(uint8_t data);
+static inline void _uart_received_non_ninth(uint8_t data);
+static inline bool _parity_ok(uint8_t data);
+static inline uint8_t _message_len(uint8_t header_byte);
+static inline void _check_addr_conflict();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Init
@@ -139,7 +139,7 @@ ISR(USART_RX_vect) {
 		_uart_received_non_ninth(data);
 }
 
-void _uart_received_ninth(uint8_t data) {
+static inline void _uart_received_ninth(uint8_t data) {
 	if (!_parity_ok(data))
 		return;
 
@@ -162,7 +162,7 @@ void _uart_received_ninth(uint8_t data) {
 	}
 }
 
-void _uart_received_non_ninth(uint8_t data) {
+static inline void _uart_received_non_ninth(uint8_t data) {
 	if (!receiving) {
 		// Another XN sends data
 		_check_addr_conflict();
@@ -183,7 +183,7 @@ void _uart_received_non_ninth(uint8_t data) {
 	}
 }
 
-bool _parity_ok(uint8_t data) {
+static inline bool _parity_ok(uint8_t data) {
 	bool parity = false;
 	for (uint8_t i = 0; i < 8; i++) {
 		parity |= data & 0x01;
@@ -192,11 +192,11 @@ bool _parity_ok(uint8_t data) {
 	return !parity;
 }
 
-uint8_t _message_len(uint8_t header_byte) {
+static inline uint8_t _message_len(uint8_t header_byte) {
 	return (header_byte & 0x0F) + 2;
 }
 
-void _check_addr_conflict() {
+static inline void _check_addr_conflict() {
 	// received_addr contains last address of any incoming data
 	if (received_addr == xpressnet_addr) {
 		// Change XN addr +- randomly
