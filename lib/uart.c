@@ -22,6 +22,7 @@ bool receiving = false;
 uint8_t received_xor;
 uint8_t received_addr;
 
+uint8_t xpressnet_addr;
 void (*uart_on_receive)(uint8_t recipient, uint8_t *data, uint8_t size) = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -32,11 +33,14 @@ void _uart_received_ninth(uint8_t data);
 void _uart_received_non_ninth(uint8_t data);
 bool _parity_ok(uint8_t data);
 uint8_t _message_len(uint8_t header_byte);
+void _check_addr_conflict();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Init
 
-void uart_init() {
+void uart_init(uint8_t xn_addr) {
+	xpressnet_addr = xn_addr;
+
 	UBRR0H = UBRRH_VALUE;
 	UBRR0L = UBRRL_VALUE;
 
@@ -139,6 +143,8 @@ void _uart_received_ninth(uint8_t data) {
 	if (!_parity_ok(data))
 		return;
 
+	received_addr = data & 0x1F;
+
 	if (((data >> 5) & 0x03) == 0x02) {
 		// normal inquiry -> send data ASAP
 		if (waiting_for_send)
@@ -153,14 +159,16 @@ void _uart_received_ninth(uint8_t data) {
 		// message for us
 		receiving = true;
 		received_xor = 0;
-		received_addr = data & 0x1F;
 		uart_input_buf_size = 0;
 	}
 }
 
 void _uart_received_non_ninth(uint8_t data) {
-	if (!receiving)
+	if (!receiving) {
+		// Another XN sends data
+		_check_addr_conflict();
 		return;
+	}
 
 	received_xor ^= data;
 	uart_input_buf[uart_input_buf_size] = data;
@@ -170,7 +178,6 @@ void _uart_received_non_ninth(uint8_t data) {
 		// whole message received
 		receiving = false;
 		if (received_xor == 0) {
-			// TODO whole message received
 			if (uart_on_receive != NULL)
 				uart_on_receive(received_addr, uart_input_buf, uart_input_buf_size);
 		}
@@ -188,4 +195,12 @@ bool _parity_ok(uint8_t data) {
 
 uint8_t _message_len(uint8_t header_byte) {
 	return (header_byte & 0x0F) + 2;
+}
+
+void _check_addr_conflict() {
+	// received_addr contains last address of any incoming data
+	if (received_addr == xpressnet_addr) {
+		// Change XN addr
+		//xpressnet_addr = ;
+	}
 }
