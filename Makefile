@@ -67,7 +67,7 @@ FUSES = -U lfuse:w:0xef:m -U hfuse:w:0xdc:m -U efuse:w:0xfe:m
 #         F_CPU = 16000000
 #         F_CPU = 18432000
 #         F_CPU = 20000000
-F_CPU = 3686400
+F_CPU = 14745600
 
 
 # Output format. (can be srec, ihex, binary)
