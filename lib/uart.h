@@ -21,7 +21,4 @@ int uart_send(uint8_t *data, uint8_t size);
 int uart_send_buf_autolen();
 int uart_send_buf();
 
-
-char uart_getchar();
-
 #endif
