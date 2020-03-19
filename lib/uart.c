@@ -13,12 +13,15 @@ uint8_t uart_output_buf[UART_OUTPUT_BUF_MAX_SIZE];
 uint8_t uart_output_buf_size = 0;
 uint8_t uart_next_byte_to_send = 0;
 bool sending = false;
+bool waiting_for_send = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void send_next_byte();
+void _uart_send_buf();
 
 ///////////////////////////////////////////////////////////////////////////////
+// Init
 
 void uart_init(void) {
 	UBRR0H = UBRRH_VALUE;
@@ -38,13 +41,11 @@ void uart_init(void) {
 	UCSR0B = _BV(RXCIE0) | _BV(TXCIE0) | _BV(UCSZ02) | _BV(RXEN0) | _BV(TXEN0);  // RX, TX enable; RT, TX interrupt enable
 }
 
-char uart_getchar() {
-	loop_until_bit_is_set(UCSR0A, RXC0);
-	return UDR0;
-}
+///////////////////////////////////////////////////////////////////////////////
+// Sending
 
 int uart_send(uint8_t *data, uint8_t size) {
-	if (sending)
+	if (!uart_can_fill_output_buf())
 		return 1;
 	if (size > UART_OUTPUT_BUF_MAX_SIZE)
 		return 2;
@@ -60,11 +61,15 @@ int uart_send(uint8_t *data, uint8_t size) {
 int uart_send_buf() {
 	if (sending)
 		return 1;
+	waiting_for_send = true;
+	return 0;
+}
 
+void _uart_send_buf() {
+	sending = true;
+	waiting_for_send = false;
 	uart_next_byte_to_send = 0;
 	uart_out();
-
-	return 0;
 }
 
 void send_next_byte() {
@@ -86,4 +91,19 @@ ISR(USART_TX_vect) {
 		uart_in();
 		sending = false;
 	}
+}
+
+bool uart_can_fill_output_buf() {
+	return !sending && !waiting_for_send;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Receiving
+
+ISR(USART_RX_vect) {
+}
+
+char uart_getchar() {
+	loop_until_bit_is_set(UCSR0A, RXC0);
+	return UDR0;
 }
