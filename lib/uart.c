@@ -137,7 +137,10 @@ void _uart_received_ninth(uint8_t data) {
 			_uart_send_buf();
 	} else if (((data >> 5) & 0x03) == 0) {
 		// request acknowledgement
-		// TODO
+		uart_output_buf[0] = 0x20;
+		uart_output_buf[1] = 0x20;
+		uart_output_buf_size = 2;
+		_uart_send_buf();
 	} else {
 		// message for us
 		receiving = true;
