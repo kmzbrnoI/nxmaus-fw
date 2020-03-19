@@ -8,8 +8,8 @@
 
 void (*encoder_on_change)(uint8_t val) = NULL;
 
-uint8_t a_counter, b_counter;
-bool a_pressed, b_pressed;
+uint8_t a_counter = ENCODER_THRESHOLD, b_counter = ENCODER_THRESHOLD;
+bool a_pressed = true, b_pressed = true;
 
 static inline void _a_pressed();
 static inline void _a_depressed();
