@@ -118,7 +118,7 @@ ISR(USART_RX_vect) {
 	bool ninth = (UCSR0B >> 1) & 0x01;
 	uint8_t data = UDR0;
 
-	if (status & (1<<FE0)|(1<<DOR0)|(1<<UPE0))
+	if (status & ((1<<FE0)|(1<<DOR0)|(1<<UPE0)))
 		return; // return on error
 
 	if (ninth)
@@ -137,11 +137,11 @@ void _uart_received_ninth(uint8_t data) {
 	if (!_parity_ok(data))
 		return;
 
-	if ((data >> 5) & 0x03 == 0x02) {
+	if (((data >> 5) & 0x03) == 0x02) {
 		// normal inquiry -> send data ASAP
 		if (waiting_for_send)
 			_uart_send_buf();
-	} else if ((data >> 5) & 0x03 == 0) {
+	} else if (((data >> 5) & 0x03) == 0) {
 		// request acknowledgement
 		// TODO
 	} else {
