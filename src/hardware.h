@@ -14,6 +14,12 @@ static inline void buttons_init() {
 	// no pull ups (hardware-based)
 }
 
+static inline void encoder_init() {
+	DDRC &= 0b11111101; // encoder as inputs
+	DDRD &= 0b11110111;
+	// no pull ups (hardware-based)
+}
+
 static inline void led_gr_left_on() { PORTB |= (1 << PORTB2); }
 static inline void led_gr_left_off() { PORTB &= ~(1 << PORTB2); }
 static inline void led_gr_left_toggle() { PORTB ^= (1 << PORTB2); }
@@ -47,5 +53,8 @@ static inline uint8_t buttons_raw_state() {
 	       (((PINC >> PINC4) & 0x01) << 5) |
 	       (((PINC >> PINC3) & 0x01) << 6);
 }
+
+static inline bool encoder_raw_a() { return ((PIND >> PIND3) & 0x01); }
+static inline bool encoder_raw_b() { return ((PINC >> PINC1) & 0x01); }
 
 #endif

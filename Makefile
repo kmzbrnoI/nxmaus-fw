@@ -85,7 +85,7 @@ OBJDIR = obj
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = src/main.c lib/uart.c src/buttons.c
+SRC = src/main.c lib/uart.c src/buttons.c src/encoder.c
 
 # List C++ source files here. (C dependencies are automatically generated.)
 # CPPSRC =
