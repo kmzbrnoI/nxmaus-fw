@@ -15,15 +15,28 @@ uint8_t uart_next_byte_to_send = 0;
 bool sending = false;
 bool waiting_for_send = false;
 
+uint8_t uart_input_buf[UART_INPUT_BUF_MAX_SIZE];
+uint8_t uart_input_buf_size;
+bool receiving = false;
+uint8_t received_xor;
+
+uint8_t xpressnet_addr;
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void send_next_byte();
 void _uart_send_buf();
+void _uart_received_ninth(uint8_t data);
+void _uart_received_non_ninth(uint8_t data);
+bool _parity_ok(uint8_t data);
+uint8_t _message_len(uint8_t header_byte);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Init
 
-void uart_init(void) {
+void uart_init(uint8_t xn_addr) {
+	xpressnet_addr = xn_addr;
+
 	UBRR0H = UBRRH_VALUE;
 	UBRR0L = UBRRL_VALUE;
 
@@ -101,9 +114,67 @@ bool uart_can_fill_output_buf() {
 // Receiving
 
 ISR(USART_RX_vect) {
+	uint8_t status = UCSR0A;
+	bool ninth = (UCSR0B >> 1) & 0x01;
+	uint8_t data = UDR0;
+
+	if (status & (1<<FE0)|(1<<DOR0)|(1<<UPE0))
+		return; // return on error
+
+	if (ninth)
+		_uart_received_ninth(data);
+	else
+		_uart_received_non_ninth(data);
 }
 
-char uart_getchar() {
-	loop_until_bit_is_set(UCSR0A, RXC0);
-	return UDR0;
+void _uart_received_ninth(uint8_t data) {
+	uint8_t addr;
+
+	addr = data & 0x1F;
+	if ((addr != xpressnet_addr) && (addr != 0))
+		return;
+
+	if (!_parity_ok(data))
+		return;
+
+	if ((data >> 5) & 0x03 == 0x02) {
+		// normal inquiry -> send data ASAP
+		if (waiting_for_send)
+			_uart_send_buf();
+	} else if ((data >> 5) & 0x03 == 0) {
+		// request acknowledgement
+		// TODO
+	} else {
+		// message for us
+		receiving = true;
+		received_xor = 0;
+		uart_input_buf_size = 0;
+	}
+}
+
+void _uart_received_non_ninth(uint8_t data) {
+	received_xor ^= data;
+	uart_input_buf[uart_input_buf_size] = data;
+	uart_input_buf_size++;
+
+	if (uart_input_buf_size >= _message_len(uart_input_buf[0])) {
+		// whole message received
+		receiving = false;
+		if (received_xor == 0) {
+			// TODO whole message received
+		}
+	}
+}
+
+bool _parity_ok(uint8_t data) {
+	bool parity = false;
+	for (uint8_t i = 0; i < 8; i++) {
+		parity |= data & 0x01;
+		data >>= 1;
+	}
+	return !parity;
+}
+
+uint8_t _message_len(uint8_t header_byte) {
+	return (header_byte & 0x0F) + 3;
 }

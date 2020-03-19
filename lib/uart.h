@@ -5,10 +5,16 @@
 #include <stdbool.h>
 
 #define UART_OUTPUT_BUF_MAX_SIZE 32
+#define UART_INPUT_BUF_MAX_SIZE 42
 extern uint8_t uart_output_buf[UART_OUTPUT_BUF_MAX_SIZE];
 extern uint8_t uart_output_buf_size;
 
-void uart_init(void);
+extern uint8_t uart_input_buf[UART_INPUT_BUF_MAX_SIZE];
+extern uint8_t uart_input_buf_size;
+
+extern uint8_t xpressnet_addr;
+
+void uart_init(uint8_t xn_addr);
 
 bool uart_can_fill_output_buf();
 int uart_send(uint8_t *data, uint8_t size);

@@ -25,7 +25,7 @@ int main() {
 void init() {
 	leds_init();
 	buttons_init();
-	uart_init();
+	uart_init(25); // TODO
 
 	sei(); // enable interrupts globally
 }
