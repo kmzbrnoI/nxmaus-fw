@@ -2,20 +2,18 @@
 #define _UART_H_
 
 #include <stdio.h>
+#include <stdbool.h>
 
-void uart_putchar(char c);
-char uart_getchar();
-
-void uart_putstr(char *str);
-
-void _uart_putchar(char c, FILE *stream);
-char _uart_getchar(FILE *stream);
+#define UART_OUTPUT_BUF_MAX_SIZE 32
+extern uint8_t uart_output_buf[UART_OUTPUT_BUF_MAX_SIZE];
+extern uint8_t uart_output_buf_size;
+extern bool sending;
 
 void uart_init(void);
 
-/* http://www.ermicro.com/blog/?p=325 */
+int uart_send(uint8_t *data, uint8_t size);
+int uart_send_buf();
 
-extern FILE uart_output;
-extern FILE uart_input;
+char uart_getchar();
 
 #endif

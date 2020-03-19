@@ -15,4 +15,7 @@ static inline void led_gr_left_on() { PORTB |= (1 << PORTB2); }
 static inline void led_gr_left_off() { PORTB &= ~(1 << PORTB2); }
 static inline void led_gr_left_toggle() { PORTB ^= (1 << PORTB2); }
 
+static inline void uart_out() { PORTD |= (1 << PORTD2); }
+static inline void uart_in() { PORTD &= ~(1 << PORTD2); }
+
 #endif
