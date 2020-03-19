@@ -159,6 +159,9 @@ void _uart_received_ninth(uint8_t data) {
 }
 
 void _uart_received_non_ninth(uint8_t data) {
+	if (!receiving)
+		return;
+
 	received_xor ^= data;
 	uart_input_buf[uart_input_buf_size] = data;
 	uart_input_buf_size++;
