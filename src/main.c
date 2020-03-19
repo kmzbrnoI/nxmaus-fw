@@ -12,6 +12,8 @@
 int main();
 void init();
 
+void button_pressed(uint8_t button);
+
 ///////////////////////////////////////////////////////////////////////////////
 
 int main() {
@@ -26,7 +28,12 @@ int main() {
 void init() {
 	leds_init();
 	buttons_init();
+	btn_on_pressed = button_pressed;
 	uart_init(25); // TODO
 
 	sei(); // enable interrupts globally
+}
+
+void button_pressed(uint8_t button) {
+	led_gr_right_toggle();
 }

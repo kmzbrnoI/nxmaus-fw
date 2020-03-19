@@ -8,8 +8,8 @@
 uint8_t btn_pressed[BUTTONS_COUNT] = {false, };
 uint8_t btn_counter[BUTTONS_COUNT] = {0, };
 
-void (*on_pressed)(uint8_t button) = NULL;
-void (*on_depressed)(uint8_t button) = NULL;
+void (*btn_on_pressed)(uint8_t button) = NULL;
+void (*btn_on_depressed)(uint8_t button) = NULL;
 
 void btn_update() {
 	uint8_t state = buttons_raw_state();
@@ -19,8 +19,8 @@ void btn_update() {
 				btn_counter[i]++;
 				if (btn_counter[i] == BTN_THRESHOLD) {
 					btn_pressed[i] = true;
-					if (on_pressed != NULL)
-						on_pressed(i);
+					if (btn_on_pressed != NULL)
+						btn_on_pressed(i);
 				}
 			}
 		} else {
@@ -28,8 +28,8 @@ void btn_update() {
 				btn_counter[i]--;
 				if (btn_counter[i] == 0) {
 					btn_pressed[i] = false;
-					if (on_depressed != NULL)
-						on_depressed(i);
+					if (btn_on_depressed != NULL)
+						btn_on_depressed(i);
 				}
 			}
 		}
