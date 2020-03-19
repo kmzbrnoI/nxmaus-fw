@@ -78,6 +78,14 @@ int uart_send_buf() {
 	return 0;
 }
 
+int  uart_send_buf_autolen() {
+	if (sending)
+		return 1;
+	uart_output_buf_size = _message_len(uart_output_buf[0]);
+	uart_send_buf();
+	return 0;
+}
+
 void _uart_send_buf() {
 	sending = true;
 	waiting_for_send = false;
@@ -176,5 +184,5 @@ bool _parity_ok(uint8_t data) {
 }
 
 uint8_t _message_len(uint8_t header_byte) {
-	return (header_byte & 0x0F) + 3;
+	return (header_byte & 0x0F) + 2;
 }
