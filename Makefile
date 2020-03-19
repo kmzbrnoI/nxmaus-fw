@@ -46,7 +46,7 @@ MCU = atmega88
 
 # Processor fuses.
 #     Define fuses for processor, flash by calling 'make fuses'
-FUSES = -U lfuse:w:0xed:m -U hfuse:w:0xd9:m -U efuse:w:0xfe:m
+FUSES = -U lfuse:w:0xef:m -U hfuse:w:0xdc:m -U efuse:w:0xfe:m
 
 
 # Processor frequency.
