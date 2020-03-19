@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
@@ -19,8 +20,9 @@ uint8_t uart_input_buf[UART_INPUT_BUF_MAX_SIZE];
 uint8_t uart_input_buf_size;
 bool receiving = false;
 uint8_t received_xor;
+uint8_t received_addr;
 
-uint8_t xpressnet_addr;
+void (*uart_on_receive)(uint8_t recipient, uint8_t *data, uint8_t size) = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -34,9 +36,7 @@ uint8_t _message_len(uint8_t header_byte);
 ///////////////////////////////////////////////////////////////////////////////
 // Init
 
-void uart_init(uint8_t xn_addr) {
-	xpressnet_addr = xn_addr;
-
+void uart_init() {
 	UBRR0H = UBRRH_VALUE;
 	UBRR0L = UBRRL_VALUE;
 
@@ -128,12 +128,6 @@ ISR(USART_RX_vect) {
 }
 
 void _uart_received_ninth(uint8_t data) {
-	uint8_t addr;
-
-	addr = data & 0x1F;
-	if ((addr != xpressnet_addr) && (addr != 0))
-		return;
-
 	if (!_parity_ok(data))
 		return;
 
@@ -148,6 +142,7 @@ void _uart_received_ninth(uint8_t data) {
 		// message for us
 		receiving = true;
 		received_xor = 0;
+		received_addr = data & 0x1F;
 		uart_input_buf_size = 0;
 	}
 }
@@ -162,6 +157,8 @@ void _uart_received_non_ninth(uint8_t data) {
 		receiving = false;
 		if (received_xor == 0) {
 			// TODO whole message received
+			if (uart_on_receive != NULL)
+				uart_on_receive(received_addr, uart_input_buf, uart_input_buf_size);
 		}
 	}
 }
