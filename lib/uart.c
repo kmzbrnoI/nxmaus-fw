@@ -156,7 +156,6 @@ void _uart_received_ninth(uint8_t data) {
 		uart_output_buf_size = 2;
 		_uart_send_buf();
 	} else {
-		// message for us
 		receiving = true;
 		received_xor = 0;
 		uart_input_buf_size = 0;
@@ -200,7 +199,7 @@ uint8_t _message_len(uint8_t header_byte) {
 void _check_addr_conflict() {
 	// received_addr contains last address of any incoming data
 	if (received_addr == xpressnet_addr) {
-		// Change XN addr
-		//xpressnet_addr = ;
+		// Change XN addr +- randomly
+		xpressnet_addr = (TCNT0 % XN_MAX_ADDR) + 1;
 	}
 }

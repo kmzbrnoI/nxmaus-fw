@@ -1,6 +1,10 @@
 #ifndef _UART_H_
 #define _UART_H_
 
+/* XpressNET communication via UART.
+ * Automatic collision solving relies on running timer0.
+ */
+
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -12,6 +16,7 @@ extern uint8_t uart_output_buf_size;
 extern uint8_t uart_input_buf[UART_INPUT_BUF_MAX_SIZE];
 extern uint8_t uart_input_buf_size;
 
+#define XN_MAX_ADDR 31
 extern uint8_t xpressnet_addr;
 
 extern void (*uart_on_receive)(uint8_t recipient, uint8_t *data, uint8_t size);
