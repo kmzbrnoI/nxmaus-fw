@@ -3,7 +3,7 @@
 #include "buttons.h"
 #include "hardware.h"
 
-#define BTN_THRESHOLD 50
+#define BTN_THRESHOLD 20  // 20 ms
 
 uint8_t btn_pressed[BUTTONS_COUNT] = {false, };
 uint8_t btn_counter[BUTTONS_COUNT] = {0, };
