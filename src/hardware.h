@@ -46,9 +46,9 @@ static inline void uart_in() { PORTD &= ~(1 << PORTD2); }
 
 static inline uint8_t buttons_raw_state() {
 	// bits: 0 INC B5 B4 B3 B2 B1 B0
-	return ((PINC >> PINC3) & 0x01) |
+	return ((PINC >> PINC5) & 0x01) |
 	       ((PINC & 0x01) << 1) |
-	       (((PINC >> PINC5) & 0x01) << 2) |
+	       (((PINB >> PINB3) & 0x01) << 2) |
 	       (((PINB >> PINB4) & 0x03) << 3) |
 	       (((PINC >> PINC4) & 0x01) << 5) |
 	       (((PINC >> PINC3) & 0x01) << 6);
