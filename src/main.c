@@ -62,7 +62,23 @@ ISR(TIMER0_COMPA_vect) {
 
 
 void button_pressed(uint8_t button) {
-	led_red_toggle();
+	if (button == BTN_TL1) {
+		if (uart_can_fill_output_buf()) {
+			led_gr_left_toggle();
+			uart_output_buf[0] = 0x21;
+			uart_output_buf[1] = 0x81;
+			uart_output_buf[2] = 0xA0;
+			uart_send_buf_autolen();
+		}
+	} else if (button == BTN_TL2) {
+		if (uart_can_fill_output_buf()) {
+			led_gr_left_toggle();
+			uart_output_buf[0] = 0x21;
+			uart_output_buf[1] = 0x80;
+			uart_output_buf[2] = 0xA1;
+			uart_send_buf_autolen();
+		}
+	}
 }
 
 void uart_received(uint8_t recipient, uint8_t *data, uint8_t size) {
