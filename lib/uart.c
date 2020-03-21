@@ -100,12 +100,7 @@ void _uart_send_buf() {
 
 void send_next_byte() {
 	loop_until_bit_is_set(UCSR0A, UDRE0); // wait for mepty transmit buffer
-
-	if (uart_next_byte_to_send == 0)
-		UCSR0B |= _BV(TXB80);
-	else
-		UCSR0B &= ~_BV(TXB80);
-
+	UCSR0B &= ~_BV(TXB80);
 	UDR0 = uart_output_buf[uart_next_byte_to_send];
 	uart_next_byte_to_send++;
 }
