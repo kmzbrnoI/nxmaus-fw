@@ -24,13 +24,13 @@ static inline void led_gr_left_on() { PORTB |= (1 << PORTB2); }
 static inline void led_gr_left_off() { PORTB &= ~(1 << PORTB2); }
 static inline void led_gr_left_toggle() { PORTB ^= (1 << PORTB2); }
 
-static inline void led_gr_right_on() { PORTB |= (1 << PORTB1); }
-static inline void led_gr_right_off() { PORTB &= ~(1 << PORTB1); }
-static inline void led_gr_right_toggle() { PORTB ^= (1 << PORTB1); }
+static inline void led_gr_right_on() { PORTB |= (1 << PORTB0); }
+static inline void led_gr_right_off() { PORTB &= ~(1 << PORTB0); }
+static inline void led_gr_right_toggle() { PORTB ^= (1 << PORTB0); }
 
-static inline void led_red_on() { PORTB |= (1 << PORTB0); }
-static inline void led_red_off() { PORTB &= ~(1 << PORTB0); }
-static inline void led_red__toggle() { PORTB ^= (1 << PORTB0); }
+static inline void led_red_on() { PORTB |= (1 << PORTB1); }
+static inline void led_red_off() { PORTB &= ~(1 << PORTB1); }
+static inline void led_red_toggle() { PORTB ^= (1 << PORTB1); }
 
 static inline void uart_out() { PORTD |= (1 << PORTD2); }
 static inline void uart_in() { PORTD &= ~(1 << PORTD2); }
