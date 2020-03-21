@@ -9,7 +9,7 @@ static inline void leds_init() {
 }
 
 static inline void buttons_init() {
-	DDRC &= 0b11001110; // buttons as inputs
+	DDRC &= 0b11000110; // buttons as inputs
 	DDRB &= 0b11000111;
 	// no pull ups (hardware-based)
 }
