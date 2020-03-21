@@ -93,6 +93,9 @@ void _uart_send_buf() {
 	waiting_for_send = false;
 	uart_next_byte_to_send = 0;
 	uart_out();
+
+	while (!(UCSR0A & (1<<UDRE0)));
+	send_next_byte();
 }
 
 void send_next_byte() {
