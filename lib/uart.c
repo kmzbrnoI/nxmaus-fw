@@ -186,7 +186,7 @@ static inline void _uart_received_non_ninth(uint8_t data) {
 static inline bool _parity_ok(uint8_t data) {
 	bool parity = false;
 	for (uint8_t i = 0; i < 8; i++) {
-		parity |= data & 0x01;
+		parity ^= data & 0x01;
 		data >>= 1;
 	}
 	return !parity;
