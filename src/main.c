@@ -62,10 +62,14 @@ ISR(TIMER0_COMPA_vect) {
 
 
 void button_pressed(uint8_t button) {
-	led_gr_right_toggle();
+	led_red_toggle();
 }
 
 void uart_received(uint8_t recipient, uint8_t *data, uint8_t size) {
+	if ((size == 3) && (data[0] == 0x61) && (data[1] == 0x01))
+		led_red_off();
+	if ((size == 3) && (data[0] == 0x61) && (data[1] == 0x00))
+		led_red_on();
 }
 
 void encoder_changed(uint8_t val) {
