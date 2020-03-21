@@ -2,9 +2,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#ifndef BAUD
 #define BAUD 62500
-#endif
 #include <util/setbaud.h>
 
 #include "uart.h"
