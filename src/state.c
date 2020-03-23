@@ -1,0 +1,16 @@
+#include "state.h"
+#include "hardware.h"
+#include "common.h"
+
+uint8_t state = ST_XN_UNADDRESSED;
+
+///////////////////////////////////////////////////////////////////////////////
+
+void _show_blinking();
+void _show_loco_direction();
+void _show_loco_direction_blinking();
+
+///////////////////////////////////////////////////////////////////////////////
+
+void state_show(uint16_t counter) {
+}

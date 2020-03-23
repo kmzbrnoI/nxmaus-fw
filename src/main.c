@@ -63,10 +63,15 @@ void init() {
 }
 
 ISR(TIMER0_COMPA_vect) {
+	static uint16_t counter = 0;
+
 	// Timer0 on 1 ms
 	btn_update();
 	encoder_update();
 	uart_update();
+	state_show(counter);
+
+	counter++;
 }
 
 void button_pressed(uint8_t button) {
