@@ -26,6 +26,9 @@ void uart_received(uint8_t recipient, uint8_t *data, uint8_t size);
 void encoder_changed(uint8_t val);
 void state_update(uint16_t counter);
 
+void uart_broadcast_received(uint8_t *data, uint8_t size);
+void uart_for_me_received(uint8_t *data, uint8_t size);
+
 ///////////////////////////////////////////////////////////////////////////////
 
 int main() {
@@ -93,12 +96,34 @@ void button_pressed(uint8_t button) {
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 void uart_received(uint8_t recipient, uint8_t *data, uint8_t size) {
-	if ((size == 3) && (data[0] == 0x61) && (data[1] == 0x01))
-		led_red_off();
-	if ((size == 3) && (data[0] == 0x61) && (data[1] == 0x00))
-		led_red_on();
+	if (recipient == 0)
+		uart_broadcast_received(data, size);
+	else if (recipient == xpressnet_addr)
+		uart_for_me_received(data, size);
 }
+
+void uart_broadcast_received(uint8_t *data, uint8_t size) {
+	if ((size == 3) && (data[0] == 0x61)) {
+		if (data[1] == 0x01) {
+			cs_status = CS_STATUS_ON;
+			led_red_off();
+		} else if (data[1] == 0x00) {
+			cs_status = CS_STATUS_OFF;
+			led_red_on();
+		} else if (data[1] == 0x02) {
+			cs_status = CS_STATUS_SERVICE;
+			led_red_on();
+		}
+	}
+}
+
+void uart_for_me_received(uint8_t *data, uint8_t size) {
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 void encoder_changed(uint8_t val) {
 }
