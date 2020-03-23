@@ -2,6 +2,7 @@
 #define _HARDWARE_H_
 
 #include <avr/io.h>
+#include <stdbool.h>
 
 static inline void leds_init() {
 	DDRB |= 0x07; // output
