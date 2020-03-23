@@ -80,7 +80,6 @@ void button_pressed(uint8_t button) {
 			led_gr_left_toggle();
 			uart_output_buf[0] = 0x21;
 			uart_output_buf[1] = 0x81;
-			uart_output_buf[2] = 0xA0;
 			uart_send_buf_autolen();
 		}
 	} else if (button == BTN_TL2) {
@@ -88,7 +87,6 @@ void button_pressed(uint8_t button) {
 			led_gr_left_toggle();
 			uart_output_buf[0] = 0x21;
 			uart_output_buf[1] = 0x80;
-			uart_output_buf[2] = 0xA1;
 			uart_send_buf_autolen();
 		}
 	}

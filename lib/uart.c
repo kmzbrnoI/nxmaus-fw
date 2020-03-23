@@ -25,7 +25,7 @@ uint8_t received_xor;
 uint8_t received_addr;
 
 uint8_t xpressnet_addr;
-void (*uart_on_receive)(uint8_t recipient, uint8_t *data, uint8_t size) = NULL;
+void (*uart_on_receive)(uint8_t recipient, uint8_t data[], uint8_t size) = NULL;
 void (*uart_on_addressed)() = NULL;
 void (*uart_on_addressed_stopped)() = NULL;
 
@@ -38,6 +38,7 @@ static inline void _uart_received_non_ninth(uint8_t data);
 static inline bool _parity_ok(uint8_t data);
 static inline uint8_t _message_len(uint8_t header_byte);
 static inline void _check_addr_conflict();
+static inline uint8_t _xor(uint8_t data[], uint8_t len);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Init
@@ -95,6 +96,7 @@ int uart_send_buf() {
 	if (sending)
 		return 1;
 	waiting_for_send = true;
+	uart_output_buf[uart_output_buf_size-1] = _xor(&uart_output_buf, uart_output_buf_size-1);
 	return 0;
 }
 
@@ -223,4 +225,11 @@ static inline void _check_addr_conflict() {
 		// Change XN addr +- randomly
 		xpressnet_addr = (TCNT0 % XN_MAX_ADDR) + 1;
 	}
+}
+
+static inline uint8_t _xor(uint8_t data[], uint8_t len) {
+	uint8_t xor = 0;
+	for (uint8_t i = 0; i < len; i++)
+		xor ^= data[i];
+	return xor;
 }
