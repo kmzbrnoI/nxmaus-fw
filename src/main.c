@@ -24,6 +24,7 @@ void init();
 void button_pressed(uint8_t button);
 void uart_received(uint8_t recipient, uint8_t *data, uint8_t size);
 void encoder_changed(uint8_t val);
+void state_update(uint16_t counter);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -70,21 +71,21 @@ ISR(TIMER0_COMPA_vect) {
 	encoder_update();
 	uart_update();
 	state_show(counter);
+	state_update(counter);
 
 	counter++;
 }
 
 void button_pressed(uint8_t button) {
-	if (button == BTN_TL1) {
-		if (uart_can_fill_output_buf()) {
+	if ((button == BTN_TL1) && (uart_can_fill_output_buf()) && (!btn_pressed[BTN_TL4])) {
+		// TL1 for DCC on/off
+
+		if (cs_status == CS_STATUS_OFF) {
 			led_gr_left_toggle();
 			uart_output_buf[0] = 0x21;
 			uart_output_buf[1] = 0x81;
 			uart_send_buf_autolen();
-		}
-	} else if (button == BTN_TL2) {
-		if (uart_can_fill_output_buf()) {
-			led_gr_left_toggle();
+		} else if (cs_status == CS_STATUS_ON) {
 			uart_output_buf[0] = 0x21;
 			uart_output_buf[1] = 0x80;
 			uart_send_buf_autolen();
@@ -100,4 +101,7 @@ void uart_received(uint8_t recipient, uint8_t *data, uint8_t size) {
 }
 
 void encoder_changed(uint8_t val) {
+}
+
+void state_update(uint16_t counter) {
 }
