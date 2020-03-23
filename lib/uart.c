@@ -161,7 +161,7 @@ static inline void _uart_received_ninth(uint8_t data) {
 
 	received_addr = data & 0x1F;
 
-	if (((data >> 5) & 0x03) == 0x02) {
+	if ((received_addr == xpressnet_addr) && (((data >> 5) & 0x03) == 0x02)) {
 		// normal inquiry -> send data ASAP
 		if (waiting_for_send)
 			_uart_send_buf();
@@ -172,7 +172,7 @@ static inline void _uart_received_ninth(uint8_t data) {
 			if (uart_on_addressed != NULL)
 				uart_on_addressed();
 		}
-	} else if (((data >> 5) & 0x03) == 0) {
+	} else if ((received_addr == xpressnet_addr) && (((data >> 5) & 0x03) == 0)) {
 		// request acknowledgement
 		uart_output_buf[0] = 0x20;
 		uart_output_buf[1] = 0x20;
