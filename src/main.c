@@ -25,6 +25,7 @@ void button_pressed(uint8_t button);
 void uart_received(uint8_t recipient, uint8_t *data, uint8_t size);
 void encoder_changed(uint8_t val);
 void state_update(uint16_t counter);
+void dcc_led_update(uint16_t counter);
 
 void uart_broadcast_received(uint8_t *data, uint8_t size);
 void uart_for_me_received(uint8_t *data, uint8_t size);
@@ -81,6 +82,7 @@ ISR(TIMER0_COMPA_vect) {
 	uart_update();
 	state_show(counter);
 	state_update(counter);
+	dcc_led_update(counter);
 
 	counter++;
 }
@@ -191,3 +193,14 @@ void state_update(uint16_t counter) {
 		}
 	}
 }
+
+void dcc_led_update(uint16_t counter) {
+	if (cs_status == CS_STATUS_OFF || cs_status == CS_STATUS_SERVICE) {
+		if ((counter%500) == 0)
+			led_red_on();
+		else if ((counter%500) == 250)
+			led_red_off();
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
