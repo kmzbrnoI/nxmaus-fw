@@ -28,6 +28,8 @@ void state_update(uint16_t counter);
 
 void uart_broadcast_received(uint8_t *data, uint8_t size);
 void uart_for_me_received(uint8_t *data, uint8_t size);
+void uart_addressed();
+void uart_addressed_stopped();
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -44,6 +46,8 @@ void init() {
 	btn_on_pressed = button_pressed;
 	uart_init(25);
 	uart_on_receive = uart_received;
+	uart_on_addressed = uart_addressed;
+	uart_on_addressed_stopped = uart_addressed_stopped;
 	encoder_init();
 	encoder_on_change = encoder_changed;
 
@@ -98,6 +102,16 @@ void button_pressed(uint8_t button) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void uart_addressed() {
+	if (state == ST_XN_UNADDRESSED)
+		state = ST_CS_STATUS_ASKING;
+}
+
+void uart_addressed_stopped() {
+	state = ST_XN_UNADDRESSED;
+	// TODO
+}
+
 void uart_received(uint8_t recipient, uint8_t *data, uint8_t size) {
 	if (recipient == 0)
 		uart_broadcast_received(data, size);
@@ -121,6 +135,18 @@ void uart_broadcast_received(uint8_t *data, uint8_t size) {
 }
 
 void uart_for_me_received(uint8_t *data, uint8_t size) {
+	if (size == 4 && data[0] == 0x62 && data[1] == 0x22) {
+		// Command station status indication response
+		if (data[2] & 0x01)
+			cs_status = CS_STATUS_OFF;
+		else if (data[2] & 0x08)
+			cs_status = CS_STATUS_SERVICE;
+		else
+			cs_status = CS_STATUS_ON;
+
+		if (state == ST_CS_STATUS_ASKING)
+			state = ST_LOCO_STATUS_ASKING;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,5 +154,14 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 void encoder_changed(uint8_t val) {
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
 void state_update(uint16_t counter) {
+	if ((state == ST_CS_STATUS_ASKING) && ((counter%1000) == 0)) {
+		if (uart_can_fill_output_buf()) {
+			uart_output_buf[0] = 0x21;
+			uart_output_buf[1] = 0x24;
+			uart_send_buf_autolen();
+		}
+	}
 }
