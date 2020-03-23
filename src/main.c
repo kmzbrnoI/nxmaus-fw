@@ -180,8 +180,9 @@ void state_update(uint16_t counter) {
 			uart_output_buf[1] = 0x24;
 			uart_send_buf_autolen();
 		}
-	} else if ((state == ST_LOCO_STATUS_ASKING) && ((counter%1000) == 0)) {
+	} else if ((state == ST_LOCO_STATUS_ASKING || state == ST_LOCO_STOLEN) && ((counter%1000) == 0)) {
 		if (uart_can_fill_output_buf()) {
+			// Ask for loco status
 			uart_output_buf[0] = 0xE3;
 			uart_output_buf[1] = 0x00;
 			uart_output_buf[2] = loco_addr_hi();
