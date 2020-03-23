@@ -49,7 +49,22 @@ static inline void _show_loco_direction(uint16_t counter) {
 }
 
 static inline void _show_loco_direction_blinking(uint16_t counter) {
+	if (loco.forward) {
+		led_gr_left_off();
+		if ((counter%500) == 0)
+			led_gr_right_on();
+		else if ((counter%500) == 250)
+			led_gr_right_off();
+	} else {
+		if ((counter%500) == 0)
+			led_gr_left_on();
+		else if ((counter%500) == 250)
+			led_gr_left_off();
+		led_gr_right_off();
+	}
 }
 
 static inline void _show_loco_released(uint16_t counter) {
+	led_gr_left_off();
+	led_gr_right_off();
 }
