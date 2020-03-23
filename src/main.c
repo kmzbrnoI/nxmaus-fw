@@ -57,6 +57,8 @@ void init() {
 	TIMSK0 |= 1 << OCIE0A; // enable interrupt on compare match A
 	OCR0A = 114; // set compare match A to match 1 ms
 
+	loco.addr = 3;  // TODO
+
 	led_gr_left_on();
 	led_gr_right_on();
 	led_red_on();
@@ -146,6 +148,17 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 
 		if (state == ST_CS_STATUS_ASKING)
 			state = ST_LOCO_STATUS_ASKING;
+	} else if (size == 6 && data[0] == 0xE4) {
+		// Locomotive information normal locomotive
+		loco.free = (data[1] >> 3) & 0x01;
+		loco.step_mode = data[1] & 0x03;
+		loco.forward = data[2] >> 7;
+		loco.steps = data[2] & 0x7F;
+		loco.fa = data[3];
+		loco.fb = data[4];
+
+		if (state == ST_LOCO_STATUS_ASKING)
+			state = ST_LOCO_MINE;
 	}
 }
 
@@ -161,6 +174,14 @@ void state_update(uint16_t counter) {
 		if (uart_can_fill_output_buf()) {
 			uart_output_buf[0] = 0x21;
 			uart_output_buf[1] = 0x24;
+			uart_send_buf_autolen();
+		}
+	} else if ((state == ST_LOCO_STATUS_ASKING) && ((counter%1000) == 0)) {
+		if (uart_can_fill_output_buf()) {
+			uart_output_buf[0] = 0xE3;
+			uart_output_buf[1] = 0x00;
+			uart_output_buf[2] = loco_addr_hi();
+			uart_output_buf[3] = loco_addr_lo();
 			uart_send_buf_autolen();
 		}
 	}

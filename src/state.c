@@ -13,7 +13,7 @@ static inline void _show_loco_direction_blinking(uint16_t counter);
 ///////////////////////////////////////////////////////////////////////////////
 
 void state_show(uint16_t counter) {
-	if (state == ST_XN_UNADDRESSED /*|| state == ST_CS_STATUS_ASKING || state == ST_LOCO_STATUS_ASKING*/) {
+	if (state == ST_XN_UNADDRESSED || state == ST_CS_STATUS_ASKING || state == ST_LOCO_STATUS_ASKING) {
 		_show_blinking(counter);
 	}
 }

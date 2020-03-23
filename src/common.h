@@ -27,4 +27,7 @@ extern LocoInfo loco;
 
 extern uint8_t cs_status;
 
+static inline uint8_t loco_addr_hi() { return loco.addr >> 8; }
+static inline uint8_t loco_addr_lo() { return loco.addr & 0xFF; }
+
 #endif
