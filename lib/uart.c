@@ -13,6 +13,10 @@ uint8_t uart_output_buf_size = 0;
 uint8_t uart_next_byte_to_send = 0;
 bool sending = false;
 bool waiting_for_send = false;
+bool uart_device_addressed = false;
+
+uint16_t uart_addressed_counter = 0;
+#define UART_ADDRESSED_TIMEOUT 1000 // 1 s
 
 uint8_t uart_input_buf[UART_INPUT_BUF_MAX_SIZE];
 uint8_t uart_input_buf_size;
@@ -22,6 +26,8 @@ uint8_t received_addr;
 
 uint8_t xpressnet_addr;
 void (*uart_on_receive)(uint8_t recipient, uint8_t *data, uint8_t size) = NULL;
+void (*uart_on_addressed)() = NULL;
+void (*uart_on_addressed_stopped)() = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -54,6 +60,18 @@ void uart_init(uint8_t xn_addr) {
 
 	UCSR0C = _BV(UCSZ01) | _BV(UCSZ00); // 9-bit data
 	UCSR0B = _BV(RXCIE0) | _BV(TXCIE0) | _BV(UCSZ02) | _BV(RXEN0) | _BV(TXEN0);  // RX, TX enable; RT, TX interrupt enable
+}
+
+void uart_update() {
+	if (uart_addressed_counter < UART_ADDRESSED_TIMEOUT) {
+		uart_addressed_counter++;
+
+		if ((uart_addressed_counter == UART_ADDRESSED_TIMEOUT) && (uart_device_addressed)) {
+			uart_device_addressed = false;
+			if (uart_on_addressed_stopped != NULL)
+				uart_on_addressed_stopped();
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -115,7 +133,7 @@ ISR(USART_TX_vect) {
 }
 
 bool uart_can_fill_output_buf() {
-	return !sending && !waiting_for_send;
+	return !sending && !waiting_for_send && uart_device_addressed;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,6 +163,13 @@ static inline void _uart_received_ninth(uint8_t data) {
 		// normal inquiry -> send data ASAP
 		if (waiting_for_send)
 			_uart_send_buf();
+
+		uart_addressed_counter = 0;
+		if (!uart_device_addressed) {
+			uart_device_addressed = true;
+			if (uart_on_addressed != NULL)
+				uart_on_addressed();
+		}
 	} else if (((data >> 5) & 0x03) == 0) {
 		// request acknowledgement
 		uart_output_buf[0] = 0x20;

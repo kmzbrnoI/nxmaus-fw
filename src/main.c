@@ -58,8 +58,8 @@ ISR(TIMER0_COMPA_vect) {
 	// Timer0 on 1 ms
 	btn_update();
 	encoder_update();
+	uart_update();
 }
-
 
 void button_pressed(uint8_t button) {
 	if (button == BTN_TL1) {

@@ -19,7 +19,11 @@ extern uint8_t uart_input_buf_size;
 #define XN_MAX_ADDR 31
 extern uint8_t xpressnet_addr;
 
+extern bool uart_device_addressed;
+
 extern void (*uart_on_receive)(uint8_t recipient, uint8_t *data, uint8_t size);
+extern void (*uart_on_addressed)();
+extern void (*uart_on_addressed_stopped)();
 
 void uart_init(uint8_t xn_addr);
 
@@ -27,5 +31,6 @@ bool uart_can_fill_output_buf();
 int uart_send(uint8_t *data, uint8_t size);
 int uart_send_buf_autolen();
 int uart_send_buf();
+void uart_update();
 
 #endif
