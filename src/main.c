@@ -157,8 +157,12 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 		loco.fa = data[3];
 		loco.fb = data[4];
 
-		if (state == ST_LOCO_STATUS_ASKING)
-			state = ST_LOCO_MINE;
+		if (state == ST_LOCO_STATUS_ASKING) {
+			if (loco.free)
+				state = ST_LOCO_MINE;
+			else
+				state = ST_LOCO_STOLEN;
+		}
 	}
 }
 
