@@ -16,6 +16,8 @@
 
 uint8_t cs_status = CS_STATUS_UNKNOWN;
 LocoInfo loco;
+uint16_t last_loco = 0xFFFF;
+uint16_t loco_release_start = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -30,7 +32,7 @@ void dcc_led_update(uint16_t counter);
 void steps_send_update(uint16_t counter);
 
 void uart_received(uint8_t recipient, uint8_t *data, uint8_t size);
-void uart_sniffed(uint8_t *data, uint8_t size);
+void uart_sniffed(uint8_t sender, uint8_t *data, uint8_t size);
 void uart_broadcast_received(uint8_t *data, uint8_t size);
 void uart_for_me_received(uint8_t *data, uint8_t size);
 void uart_addressed();
@@ -174,6 +176,9 @@ void button_pressed(uint8_t button) {
 				loco.fa ^= 0x04;
 				loco_send_fa();
 			}
+		} else if (button == BTN_TL1 && btn_pressed[BTN_TL4] && last_loco_defined()) {
+			// Loco acquire
+			state = ST_LOCO_RELEASED;
 		}
 	}
 }
@@ -277,8 +282,11 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 	}
 }
 
-void uart_sniffed(uint8_t *data, uint8_t size) {
-	led_gr_left_toggle();
+void uart_sniffed(uint8_t sender, uint8_t *data, uint8_t size) {
+	if (size == 6 && data[0] == 0xE4 && (data[1] == 0x10 || data[1] == 0x11 || data[1] == 0x12 || data[1] == 0x13)) {
+		// Loco set speed sniffed
+		last_loco = (data[2] << 8) | data[3];
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -309,6 +317,15 @@ void state_update(uint16_t counter) {
 			uart_output_buf[2] = loco_addr_hi();
 			uart_output_buf[3] = loco_addr_lo();
 			uart_send_buf_autolen();
+		}
+	} else if (state == ST_LOCO_RELEASED) {
+		if (loco_release_start == 0) {
+			loco_release_start = counter;
+		} else if (counter == loco_release_start+1000) {
+			loco.addr = last_loco;
+			state = ST_LOCO_STATUS_ASKING;
+			loco_release_start = 0;
+			eeprom_write_word((uint16_t*)EEPROM_LOC_LOCO_ADDR, loco.addr);
 		}
 	}
 }

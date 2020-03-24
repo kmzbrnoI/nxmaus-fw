@@ -35,9 +35,11 @@ extern LocoInfo loco;
 #define CS_STATUS_SERVICE 3
 
 extern uint8_t cs_status;
+extern uint16_t last_loco;
 
 static inline uint8_t loco_addr_hi() { return loco.addr >> 8; }
 static inline uint8_t loco_addr_lo() { return loco.addr & 0xFF; }
+static inline bool last_loco_defined() { return last_loco != 0xFFFF; }
 
 void loco_send_seedir();
 void loco_send_fa();
