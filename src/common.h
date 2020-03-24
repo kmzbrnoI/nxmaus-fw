@@ -2,6 +2,7 @@
 #define _COMMON_H_
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #define STEPS_14 0x00
 #define STEPS_27 0x01
@@ -29,5 +30,10 @@ extern uint8_t cs_status;
 
 static inline uint8_t loco_addr_hi() { return loco.addr >> 8; }
 static inline uint8_t loco_addr_lo() { return loco.addr & 0xFF; }
+
+void loco_send_seedir();
+void loco_send_fa();
+void loco_send_fb_58();
+void loco_send_fb_912();
 
 #endif
