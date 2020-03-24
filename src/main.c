@@ -255,7 +255,7 @@ void dcc_led_update(uint16_t counter) {
 }
 
 void steps_send_update(uint16_t counter) {
-	if ((counter%100) == 0 && loco.steps != loco.steps_buf) {
+	if ((counter%50) == 0 && loco.steps != loco.steps_buf) {
 		loco.steps = loco.steps_buf;
 		if (state == ST_LOCO_STOLEN)
 			state = ST_LOCO_MINE;
