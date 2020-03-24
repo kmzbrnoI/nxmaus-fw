@@ -28,6 +28,7 @@ uint8_t xpressnet_addr;
 void (*uart_on_receive)(uint8_t recipient, uint8_t data[], uint8_t size) = NULL;
 void (*uart_on_addressed)() = NULL;
 void (*uart_on_addressed_stopped)() = NULL;
+void (*uart_on_addr_changed)(uint8_t new_addr) = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -224,6 +225,8 @@ static inline void _check_addr_conflict() {
 	if (received_addr == xpressnet_addr) {
 		// Change XN addr +- randomly
 		xpressnet_addr = (TCNT0 % XN_MAX_ADDR) + 1;
+		if (uart_on_addr_changed != NULL)
+			uart_on_addr_changed(xpressnet_addr);
 	}
 }
 

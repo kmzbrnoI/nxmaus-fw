@@ -34,6 +34,7 @@ void uart_broadcast_received(uint8_t *data, uint8_t size);
 void uart_for_me_received(uint8_t *data, uint8_t size);
 void uart_addressed();
 void uart_addressed_stopped();
+void uart_addr_changed(uint8_t new_addr);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -52,6 +53,7 @@ void init() {
 	uart_on_receive = uart_received;
 	uart_on_addressed = uart_addressed;
 	uart_on_addressed_stopped = uart_addressed_stopped;
+	uart_on_addr_changed = uart_addr_changed;
 	encoder_init();
 	encoder_on_change = encoder_changed;
 
@@ -91,7 +93,6 @@ void eeprom_init() {
 	if (xpressnet_addr == 0xFF) {
 		xpressnet_addr = 25;
 		eeprom_write_byte((uint8_t*)EEPROM_LOC_XN_ADDR, xpressnet_addr);
-		// TODO: write to memory on update
 	}
 }
 
@@ -185,6 +186,10 @@ void uart_addressed() {
 void uart_addressed_stopped() {
 	state = ST_XN_UNADDRESSED;
 	// TODO
+}
+
+void uart_addr_changed(uint8_t new_addr) {
+	eeprom_write_byte((uint8_t*)EEPROM_LOC_XN_ADDR, new_addr);
 }
 
 void uart_received(uint8_t recipient, uint8_t *data, uint8_t size) {
