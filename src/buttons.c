@@ -5,7 +5,7 @@
 
 #define BTN_THRESHOLD 20  // 20 ms
 
-uint8_t btn_pressed[BUTTONS_COUNT] = {false, };
+bool btn_pressed[BUTTONS_COUNT] = {false, };
 uint8_t btn_counter[BUTTONS_COUNT] = {0, };
 
 void (*btn_on_pressed)(uint8_t button) = NULL;

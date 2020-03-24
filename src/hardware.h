@@ -40,13 +40,13 @@ static inline void uart_in() { PORTD &= ~(1 << PORTD2); }
 #define BTN_TL1 0
 #define BTN_TL2 1
 #define BTN_TL3 2
-#define BTN_TL4 3
+#define BTN_TL4 5
 #define BTN_TL5 4
-#define BTN_TL6 5
+#define BTN_TL6 3
 #define BTN_INC 6
 
 static inline uint8_t buttons_raw_state() {
-	// bits: 0 INC B5 B4 B3 B2 B1 B0
+	// bits: 0 INC B3 B4 B5 B2 B1 B0
 	return ((PINC >> PINC5) & 0x01) |
 	       ((PINC & 0x01) << 1) |
 	       (((PINB >> PINB3) & 0x01) << 2) |

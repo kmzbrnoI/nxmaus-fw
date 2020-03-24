@@ -103,18 +103,52 @@ void button_pressed(uint8_t button) {
 			uart_output_buf[1] = 0x80;
 			uart_send_buf_autolen();
 		}
-	} else if (button == BTN_INC && (state == ST_LOCO_MINE || state == ST_LOCO_STOLEN)) {
-		if (loco.steps > 0) {
-			loco.steps = 0;
-			loco.steps_buf = 0;
-		} else {
-			loco.forward = !loco.forward;
+	}
+
+	if ((state == ST_LOCO_MINE) || (state == ST_LOCO_STOLEN)) {
+		if (button == BTN_INC) {
+			if (loco.steps > 0) {
+				loco.steps = 0;
+				loco.steps_buf = 0;
+			} else {
+				loco.forward = !loco.forward;
+			}
+
+			if (state == ST_LOCO_STOLEN)
+				state = ST_LOCO_MINE;
+
+			loco_send_seedir();
+		} else if (button == BTN_TL2) {
+			if (btn_pressed[BTN_TL4])
+				loco.fa ^= 0x08;
+			else
+				loco.fa ^= 0x10;
+			loco_send_fa();
+		} else if (button == BTN_TL3) {
+			if (btn_pressed[BTN_TL4]) {
+				loco.fb ^= 0x01;
+				loco_send_fb_58();
+			} else {
+				loco.fa ^= 0x01;
+				loco_send_fa();
+			}
+		} else if (button == BTN_TL5) {
+			if (btn_pressed[BTN_TL4]) {
+				loco.fb ^= 0x02;
+				loco_send_fb_58();
+			} else {
+				loco.fa ^= 0x02;
+				loco_send_fa();
+			}
+		} else if (button == BTN_TL6) {
+			if (btn_pressed[BTN_TL4]) {
+				loco.fb ^= 0x04;
+				loco_send_fb_58();
+			} else {
+				loco.fa ^= 0x04;
+				loco_send_fa();
+			}
 		}
-
-		if (state == ST_LOCO_STOLEN)
-			state = ST_LOCO_MINE;
-
-		loco_send_seedir();
 	}
 }
 
