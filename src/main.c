@@ -185,6 +185,10 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 				state = ST_LOCO_MINE;
 			else
 				state = ST_LOCO_STOLEN;
+
+			led_red_off();
+			led_gr_left_off();
+			led_gr_right_off();
 		}
 	} else if ((size == 5) && (data[0] == 0xE3) && (data[1] == 0x40) &&
 	           (data[2] == loco_addr_hi()) && (data[3] == loco_addr_lo())) {
