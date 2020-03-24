@@ -2,6 +2,7 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <avr/eeprom.h>
 
 #include "hardware.h"
 #include "buttons.h"
@@ -20,6 +21,7 @@ LocoInfo loco;
 
 int main();
 void init();
+void eeprom_init();
 
 void button_pressed(uint8_t button);
 void uart_received(uint8_t recipient, uint8_t *data, uint8_t size);
@@ -59,11 +61,11 @@ void init() {
 	TIMSK0 |= 1 << OCIE0A; // enable interrupt on compare match A
 	OCR0A = 114; // set compare match A to match 1 ms
 
-	loco.addr = 3;  // TODO
-
 	led_gr_left_on();
 	led_gr_right_on();
 	led_red_on();
+
+	eeprom_init();
 
 	_delay_ms(250);
 
@@ -73,6 +75,27 @@ void init() {
 
 	sei(); // enable interrupts globally
 }
+
+void eeprom_init() {
+	loco.addr = eeprom_read_word((uint16_t*)EEPROM_LOC_LOCO_ADDR);
+	if (loco.addr == 0xFFFF) { // default EEPROM value
+		loco.addr = 3;
+		eeprom_write_word((uint16_t*)EEPROM_LOC_LOCO_ADDR, loco.addr);
+	}
+
+	uint16_t version = eeprom_read_word((uint16_t*)EEPROM_LOC_SW_VERSION);
+	if (version != SW_VERSION)
+		eeprom_write_word((uint16_t*)EEPROM_LOC_SW_VERSION, SW_VERSION);
+
+	xpressnet_addr = eeprom_read_byte((uint8_t*)EEPROM_LOC_XN_ADDR);
+	if (xpressnet_addr == 0xFF) {
+		xpressnet_addr = 25;
+		eeprom_write_byte((uint8_t*)EEPROM_LOC_XN_ADDR, xpressnet_addr);
+		// TODO: write to memory on update
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 ISR(TIMER0_COMPA_vect) {
 	static uint16_t counter = 0;
