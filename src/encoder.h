@@ -5,6 +5,6 @@
 
 void encoder_update();
 
-extern void (*encoder_on_change)(uint8_t val);
+extern void (*encoder_on_change)(int8_t val);
 
 #endif

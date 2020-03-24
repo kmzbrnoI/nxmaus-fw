@@ -6,13 +6,13 @@
 
 #define ENCODER_THRESHOLD 10  // 10 ms
 
-void (*encoder_on_change)(uint8_t val) = NULL;
+void (*encoder_on_change)(int8_t val) = NULL;
 
 uint8_t a_counter = ENCODER_THRESHOLD, b_counter = ENCODER_THRESHOLD;
 bool a_pressed = true, b_pressed = true;
 
 static inline void _a_pressed();
-static inline void _callback(uint8_t val);
+static inline void _callback(int8_t val);
 
 void encoder_update() {
 	if (encoder_raw_a()) {
@@ -46,9 +46,9 @@ void encoder_update() {
 	}
 }
 
-static inline void _a_pressed() { _callback(b_pressed ? 0 : 1); }
+static inline void _a_pressed() { _callback(b_pressed ? 1 : -1); }
 
-static inline void _callback(uint8_t val) {
+static inline void _callback(int8_t val) {
 	if (encoder_on_change != NULL)
 		encoder_on_change(val);
 }

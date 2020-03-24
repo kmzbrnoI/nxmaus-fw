@@ -23,9 +23,10 @@ void init();
 
 void button_pressed(uint8_t button);
 void uart_received(uint8_t recipient, uint8_t *data, uint8_t size);
-void encoder_changed(uint8_t val);
+void encoder_changed(int8_t val);
 void state_update(uint16_t counter);
 void dcc_led_update(uint16_t counter);
+void steps_send_update(uint16_t counter);
 
 void uart_broadcast_received(uint8_t *data, uint8_t size);
 void uart_for_me_received(uint8_t *data, uint8_t size);
@@ -83,6 +84,7 @@ ISR(TIMER0_COMPA_vect) {
 	state_show(counter);
 	state_update(counter);
 	dcc_led_update(counter);
+	steps_send_update(counter);
 
 	counter++;
 }
@@ -101,6 +103,18 @@ void button_pressed(uint8_t button) {
 			uart_output_buf[1] = 0x80;
 			uart_send_buf_autolen();
 		}
+	} else if (button == BTN_INC && (state == ST_LOCO_MINE || state == ST_LOCO_STOLEN)) {
+		if (loco.steps > 0) {
+			loco.steps = 0;
+			loco.steps_buf = 0;
+		} else {
+			loco.forward = !loco.forward;
+		}
+
+		if (state == ST_LOCO_STOLEN)
+			state = ST_LOCO_MINE;
+
+		loco_send_seedir();
 	}
 }
 
@@ -179,6 +193,7 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 		} else
 			loco.steps = 0;
 
+		loco.steps_buf = loco.steps;
 
 		if (state == ST_LOCO_STATUS_ASKING) {
 			if (loco.free)
@@ -200,7 +215,13 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void encoder_changed(uint8_t val) {
+void encoder_changed(int8_t val) {
+	if (state == ST_LOCO_MINE || state == ST_LOCO_STOLEN) {
+		if (val > 0 && loco.steps_buf < MAX_STEP)
+			loco.steps_buf++;
+		else if (val < 0 && loco.steps_buf > 0)
+			loco.steps_buf--;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -212,7 +233,7 @@ void state_update(uint16_t counter) {
 			uart_output_buf[1] = 0x24;
 			uart_send_buf_autolen();
 		}
-	} else if ((state == ST_LOCO_STATUS_ASKING || state == ST_LOCO_STOLEN) && ((counter%1000) == 0)) {
+	} else if ((state == ST_LOCO_STATUS_ASKING || state == ST_LOCO_STOLEN) && ((counter%500) == 0)) {
 		if (uart_can_fill_output_buf()) {
 			// Ask for loco status
 			uart_output_buf[0] = 0xE3;
@@ -230,6 +251,15 @@ void dcc_led_update(uint16_t counter) {
 			led_red_on();
 		else if ((counter%500) == 250)
 			led_red_off();
+	}
+}
+
+void steps_send_update(uint16_t counter) {
+	if ((counter%100) == 0 && loco.steps != loco.steps_buf) {
+		loco.steps = loco.steps_buf;
+		if (state == ST_LOCO_STOLEN)
+			state = ST_LOCO_MINE;
+		loco_send_seedir();
 	}
 }
 

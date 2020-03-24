@@ -9,6 +9,8 @@
 #define STEPS_28 0x02
 #define STEPS_128 0x04
 
+#define MAX_STEP 28
+
 typedef struct {
 	uint16_t addr;
 	bool free;
@@ -17,6 +19,7 @@ typedef struct {
 	uint8_t steps;
 	uint8_t fa;
 	uint8_t fb;
+	uint8_t steps_buf;
 } LocoInfo;
 
 extern LocoInfo loco;
