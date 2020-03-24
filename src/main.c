@@ -24,12 +24,13 @@ void init();
 void eeprom_init();
 
 void button_pressed(uint8_t button);
-void uart_received(uint8_t recipient, uint8_t *data, uint8_t size);
 void encoder_changed(int8_t val);
 void state_update(uint16_t counter);
 void dcc_led_update(uint16_t counter);
 void steps_send_update(uint16_t counter);
 
+void uart_received(uint8_t recipient, uint8_t *data, uint8_t size);
+void uart_sniffed(uint8_t *data, uint8_t size);
 void uart_broadcast_received(uint8_t *data, uint8_t size);
 void uart_for_me_received(uint8_t *data, uint8_t size);
 void uart_addressed();
@@ -54,6 +55,7 @@ void init() {
 	uart_on_addressed = uart_addressed;
 	uart_on_addressed_stopped = uart_addressed_stopped;
 	uart_on_addr_changed = uart_addr_changed;
+	uart_on_sniff = uart_sniffed;
 	encoder_init();
 	encoder_on_change = encoder_changed;
 
@@ -273,6 +275,10 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 		if (state == ST_LOCO_MINE)
 			state = ST_LOCO_STOLEN;
 	}
+}
+
+void uart_sniffed(uint8_t *data, uint8_t size) {
+	led_gr_left_toggle();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

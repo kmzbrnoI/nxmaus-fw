@@ -22,6 +22,7 @@ extern uint8_t xpressnet_addr;
 extern bool uart_device_addressed;
 
 extern void (*uart_on_receive)(uint8_t recipient, uint8_t *data, uint8_t size);
+extern void (*uart_on_sniff)(uint8_t sender, uint8_t *data, uint8_t size);
 extern void (*uart_on_addressed)();
 extern void (*uart_on_addressed_stopped)();
 extern void (*uart_on_addr_changed)(uint8_t new_addr);

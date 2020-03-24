@@ -19,9 +19,9 @@ uint16_t uart_addressed_counter = 0;
 #define UART_ADDRESSED_TIMEOUT 1000 // 1 s
 
 uint8_t uart_input_buf[UART_INPUT_BUF_MAX_SIZE];
-uint8_t uart_input_buf_size;
+uint8_t uart_input_buf_size = 0;
 bool receiving = false;
-uint8_t received_xor;
+uint8_t received_xor = 0;
 uint8_t received_addr;
 
 uint8_t xpressnet_addr;
@@ -29,6 +29,7 @@ void (*uart_on_receive)(uint8_t recipient, uint8_t data[], uint8_t size) = NULL;
 void (*uart_on_addressed)() = NULL;
 void (*uart_on_addressed_stopped)() = NULL;
 void (*uart_on_addr_changed)(uint8_t new_addr) = NULL;
+void (*uart_on_sniff)(uint8_t sender, uint8_t *data, uint8_t size) = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -179,7 +180,7 @@ static inline void _uart_received_ninth(uint8_t data) {
 		uart_output_buf[1] = 0x20;
 		uart_output_buf_size = 2;
 		_uart_send_buf();
-	} else {
+	} else if (((data >> 5) & 0x03) == 0x03) {
 		receiving = true;
 		received_xor = 0;
 		uart_input_buf_size = 0;
@@ -188,22 +189,31 @@ static inline void _uart_received_ninth(uint8_t data) {
 
 static inline void _uart_received_non_ninth(uint8_t data) {
 	if (!receiving) {
-		// Another XN sends data
+		// Another XN device sends data
 		_check_addr_conflict();
-		return;
 	}
 
-	received_xor ^= data;
-	uart_input_buf[uart_input_buf_size] = data;
-	uart_input_buf_size++;
+	if (uart_input_buf_size < UART_INPUT_BUF_MAX_SIZE) {
+		received_xor ^= data;
+		uart_input_buf[uart_input_buf_size] = data;
+		uart_input_buf_size++;
+	}
 
 	if (uart_input_buf_size >= _message_len(uart_input_buf[0])) {
 		// whole message received
-		receiving = false;
 		if (received_xor == 0) {
-			if (uart_on_receive != NULL)
-				uart_on_receive(received_addr, uart_input_buf, uart_input_buf_size);
+			if (receiving) {
+				if (uart_on_receive != NULL)
+					uart_on_receive(received_addr, uart_input_buf, uart_input_buf_size);
+			} else {
+				if (uart_on_sniff != NULL)
+					uart_on_sniff(received_addr, uart_input_buf, uart_input_buf_size);
+			}
 		}
+
+		receiving = false;
+		received_xor = 0;
+		uart_input_buf_size = 0;
 	}
 }
 
