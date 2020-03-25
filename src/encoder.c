@@ -12,6 +12,7 @@ uint8_t a_counter = ENCODER_THRESHOLD, b_counter = ENCODER_THRESHOLD;
 bool a_pressed = true, b_pressed = true;
 
 static inline void _a_pressed();
+static inline void _a_depressed();
 static inline void _callback(int8_t val);
 
 void encoder_update() {
@@ -26,8 +27,10 @@ void encoder_update() {
 	} else {
 		if (a_counter > 0) {
 			a_counter--;
-			if (a_counter == 0)
+			if (a_counter == 0) {
 				a_pressed = false;
+				_a_depressed();
+			}
 		}
 	}
 
@@ -46,7 +49,8 @@ void encoder_update() {
 	}
 }
 
-static inline void _a_pressed() { _callback(b_pressed ? 1 : -1); }
+static inline void _a_pressed() { if (b_pressed) _callback(1); }
+static inline void _a_depressed() { if (b_pressed) _callback(-1); }
 
 static inline void _callback(int8_t val) {
 	if (encoder_on_change != NULL)
