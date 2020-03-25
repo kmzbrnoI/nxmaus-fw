@@ -54,3 +54,13 @@ void loco_send_fb_912() {
 	uart_output_buf[4] = (loco.fb >> 4);
 	uart_send_buf_autolen();
 }
+
+void loco_send_emergency_stop() {
+	if (!uart_can_fill_output_buf())
+		return;
+
+	uart_output_buf[0] = 0x92;
+	uart_output_buf[1] = loco_addr_hi();
+	uart_output_buf[2] = loco_addr_lo();
+	uart_send_buf_autolen();
+}

@@ -136,7 +136,7 @@ void button_pressed(uint8_t button) {
 	}
 
 	if ((state == ST_LOCO_MINE) || (state == ST_LOCO_STOLEN)) {
-		if (button == BTN_INC) {
+		if (button == BTN_INC && !btn_pressed[BTN_TL4]) {
 			if (loco.steps > 0) {
 				loco.steps = 0;
 				loco.steps_buf = 0;
@@ -181,6 +181,10 @@ void button_pressed(uint8_t button) {
 		} else if (button == BTN_TL1 && btn_pressed[BTN_TL4] && last_loco_defined()) {
 			// Loco acquire
 			state = ST_LOCO_RELEASED;
+		} else if (button == BTN_INC && btn_pressed[BTN_TL4]) {
+			loco.steps = 0;
+			loco.steps_buf = 0;
+			loco_send_emergency_stop();
 		}
 	}
 }

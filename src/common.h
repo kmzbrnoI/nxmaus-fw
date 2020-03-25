@@ -45,5 +45,6 @@ void loco_send_seedir();
 void loco_send_fa();
 void loco_send_fb_58();
 void loco_send_fb_912();
+void loco_send_emergency_stop();
 
 #endif
