@@ -193,6 +193,10 @@ static inline void _uart_received_non_ninth(uint8_t data) {
 		_check_addr_conflict();
 	}
 
+	// Receive data if 'receiving' is false too -> sniff data sentt from XN
+	// device to Command Station (these data start with ninth bit 0).
+	// No need for timeouts, ninth bit will always reset receiving.
+
 	if (uart_input_buf_size < UART_INPUT_BUF_MAX_SIZE) {
 		received_xor ^= data;
 		uart_input_buf[uart_input_buf_size] = data;
@@ -211,6 +215,7 @@ static inline void _uart_received_non_ninth(uint8_t data) {
 			}
 		}
 
+		// Prepare for next receiving from XpressNET device
 		receiving = false;
 		received_xor = 0;
 		uart_input_buf_size = 0;

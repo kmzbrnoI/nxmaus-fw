@@ -1,8 +1,23 @@
 #ifndef _UART_H_
 #define _UART_H_
 
-/* XpressNET communication via UART.
- * Automatic collision solving relies on running timer0.
+/* XpressNET communication lirary (via UART).
+ *
+ * Automatic XpressNET device address collision detection & changing relies
+ * on running timer0.
+ *
+ * Before changing uart_output_buf & calling uart_send*, you must check that
+ * uart_can_fill_output_buf() is true.
+ *
+ * This library uses constant adressing timeout 1 s, which is not enough for
+ * Command Station in programming mode -> it will call error event
+ * uart_on_addressed_stopped 1 s after service mode enter. After resuming to
+ * normal mode, library will detect it and call uart_on_addressed.
+ *
+ * This library allows to sniff data from command station to other XpressNET
+ * devices (uart_on_receive) as well as sniffing data sent from other XpressNET
+ * devices to the Command Station (uart_on_sniff). If you don't want to use
+ * these features, just don't register events.
  */
 
 #include <stdio.h>
