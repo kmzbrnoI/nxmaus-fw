@@ -10,6 +10,7 @@ static inline void _show_blinking(uint16_t counter);
 static inline void _show_loco_direction(uint16_t counter);
 static inline void _show_loco_direction_blinking(uint16_t counter);
 static inline void _show_loco_released(uint16_t counter);
+static inline void _show_red_led(uint16_t counter);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -23,6 +24,8 @@ void state_show(uint16_t counter) {
 	} else if (state == ST_LOCO_RELEASED) {
 		_show_loco_released(counter);
 	}
+
+	_show_red_led(counter);
 }
 
 static inline void _show_blinking(uint16_t counter) {
@@ -67,4 +70,20 @@ static inline void _show_loco_direction_blinking(uint16_t counter) {
 static inline void _show_loco_released(uint16_t counter) {
 	led_gr_left_off();
 	led_gr_right_off();
+}
+
+static inline void _show_red_led(uint16_t counter) {
+	if (cs_status == CS_STATUS_OFF || cs_status == CS_STATUS_SERVICE) {
+		if ((counter%500) == 0)
+			led_red_on();
+		else if ((counter%500) == 250)
+			led_red_off();
+	} else if (state == ST_LOCO_MINE || state == ST_LOCO_STOLEN) {
+		if (loco.steps == 0)
+			led_red_on();
+		else
+			led_red_off();
+	} else {
+		led_red_off();
+	}
 }

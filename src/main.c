@@ -28,7 +28,6 @@ void eeprom_init();
 void button_pressed(uint8_t button);
 void encoder_changed(int8_t val);
 void state_update(uint16_t counter);
-void dcc_led_update(uint16_t counter);
 void steps_send_update(uint16_t counter);
 
 void uart_received(uint8_t recipient, uint8_t *data, uint8_t size);
@@ -113,7 +112,6 @@ ISR(TIMER0_COMPA_vect) {
 	uart_update();
 	state_show(counter);
 	state_update(counter);
-	dcc_led_update(counter);
 	steps_send_update(counter);
 
 	counter++;
@@ -178,9 +176,10 @@ void button_pressed(uint8_t button) {
 				loco.fa ^= 0x04;
 				loco_send_fa();
 			}
-		} else if (button == BTN_TL1 && btn_pressed[BTN_TL4] && last_loco_defined()) {
+		} else if (button == BTN_TL1 && btn_pressed[BTN_TL4] && last_loco_defined() && last_loco != loco.addr) {
 			// Loco acquire
 			state = ST_LOCO_RELEASED;
+			loco.addr = last_loco;
 			last_loco = 0xFFFF;
 		} else if (button == BTN_INC && btn_pressed[BTN_TL4]) {
 			loco.steps = 0;
@@ -342,20 +341,11 @@ void state_update(uint16_t counter) {
 		if (loco_release_start == 0) {
 			loco_release_start = counter;
 		} else if (counter == loco_release_start+1000) {
-			loco.addr = last_loco;
 			state = ST_LOCO_STATUS_ASKING;
 			loco_release_start = 0;
 			eeprom_write_word((uint16_t*)EEPROM_LOC_LOCO_ADDR, loco.addr);
+			uart_send_loco_status_ask();
 		}
-	}
-}
-
-void dcc_led_update(uint16_t counter) {
-	if (cs_status == CS_STATUS_OFF || cs_status == CS_STATUS_SERVICE) {
-		if ((counter%500) == 0)
-			led_red_on();
-		else if ((counter%500) == 250)
-			led_red_off();
 	}
 }
 
