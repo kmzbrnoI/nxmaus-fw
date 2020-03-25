@@ -1,5 +1,5 @@
-#ifndef _UART_H_
-#define _UART_H_
+#ifndef _XPRESSNET_H_
+#define _XPRESSNET_H_
 
 /* XpressNET communication lirary (via UART).
  *
@@ -24,7 +24,7 @@
 #include <stdbool.h>
 
 #define UART_OUTPUT_BUF_MAX_SIZE 32
-#define UART_INPUT_BUF_MAX_SIZE 42
+#define UART_INPUT_BUF_MAX_SIZE 32
 extern uint8_t uart_output_buf[UART_OUTPUT_BUF_MAX_SIZE];
 extern uint8_t uart_output_buf_size;
 
