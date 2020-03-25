@@ -38,6 +38,8 @@ void uart_for_me_received(uint8_t *data, uint8_t size);
 void uart_addressed();
 void uart_addressed_stopped();
 void uart_addr_changed(uint8_t new_addr);
+void uart_send_cs_status_ask();
+void uart_send_loco_status_ask();
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -186,8 +188,10 @@ void button_pressed(uint8_t button) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void uart_addressed() {
-	if (state == ST_XN_UNADDRESSED)
+	if (state == ST_XN_UNADDRESSED) {
 		state = ST_CS_STATUS_ASKING;
+		uart_send_cs_status_ask();
+	}
 }
 
 void uart_addressed_stopped() {
@@ -231,8 +235,10 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 		else
 			cs_status = CS_STATUS_ON;
 
-		if (state == ST_CS_STATUS_ASKING)
+		if (state == ST_CS_STATUS_ASKING) {
 			state = ST_LOCO_STATUS_ASKING;
+			uart_send_loco_status_ask();
+		}
 	} else if (size == 6 && data[0] == 0xE4) {
 		// Locomotive information normal locomotive
 		loco.free = (data[1] >> 3) & 0x01;
@@ -289,6 +295,26 @@ void uart_sniffed(uint8_t sender, uint8_t *data, uint8_t size) {
 	}
 }
 
+void uart_send_cs_status_ask() {
+	if (!uart_can_fill_output_buf())
+		return;
+
+	uart_output_buf[0] = 0x21;
+	uart_output_buf[1] = 0x24;
+	uart_send_buf_autolen();
+}
+
+void uart_send_loco_status_ask() {
+	if (!uart_can_fill_output_buf())
+		return;
+
+	uart_output_buf[0] = 0xE3;
+	uart_output_buf[1] = 0x00;
+	uart_output_buf[2] = loco_addr_hi();
+	uart_output_buf[3] = loco_addr_lo();
+	uart_send_buf_autolen();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void encoder_changed(int8_t val) {
@@ -303,21 +329,10 @@ void encoder_changed(int8_t val) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void state_update(uint16_t counter) {
-	if ((state == ST_CS_STATUS_ASKING) && ((counter%1000) == 0)) {
-		if (uart_can_fill_output_buf()) {
-			uart_output_buf[0] = 0x21;
-			uart_output_buf[1] = 0x24;
-			uart_send_buf_autolen();
-		}
+	if ((state == ST_CS_STATUS_ASKING) && ((counter%500) == 0)) {
+		uart_send_cs_status_ask();
 	} else if ((state == ST_LOCO_STATUS_ASKING || state == ST_LOCO_STOLEN) && ((counter%500) == 0)) {
-		if (uart_can_fill_output_buf()) {
-			// Ask for loco status
-			uart_output_buf[0] = 0xE3;
-			uart_output_buf[1] = 0x00;
-			uart_output_buf[2] = loco_addr_hi();
-			uart_output_buf[3] = loco_addr_lo();
-			uart_send_buf_autolen();
-		}
+		uart_send_loco_status_ask();
 	} else if (state == ST_LOCO_RELEASED) {
 		if (loco_release_start == 0) {
 			loco_release_start = counter;
