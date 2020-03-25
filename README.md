@@ -19,6 +19,12 @@ programmer and then put it to NXmaus.
 This FW uses EEPROM, however no loading of EEPROM is required. There should
 be just an empty EEPROM.
 
+```bash
+$ make
+$ make fuses
+$ make program
+```
+
 ## Author's toolkit
 
 Text editor + `make`. No more, no less.
