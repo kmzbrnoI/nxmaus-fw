@@ -181,6 +181,7 @@ void button_pressed(uint8_t button) {
 		} else if (button == BTN_TL1 && btn_pressed[BTN_TL4] && last_loco_defined()) {
 			// Loco acquire
 			state = ST_LOCO_RELEASED;
+			last_loco = 0xFFFF;
 		} else if (button == BTN_INC && btn_pressed[BTN_TL4]) {
 			loco.steps = 0;
 			loco.steps_buf = 0;
