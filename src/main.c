@@ -254,10 +254,12 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 
 		uint8_t steps = data[2] & 0x7F;
 		if (step_mode == STEPS_14) {
-			steps--;
+			steps = steps & 0x0F;
+			if (steps > 0)
+				steps--;
 			loco.steps = 2*steps;
 		} else if (step_mode == STEPS_27 || step_mode == STEPS_28) {
-			steps = (steps << 1) | ((steps >> 4) & 0x01);
+			steps = ((steps & 0x0F) << 1) | ((steps >> 4) & 0x01);
 			if (steps < 4)
 				steps = 0;
 			else
