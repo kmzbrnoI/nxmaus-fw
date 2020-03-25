@@ -22,10 +22,11 @@ void state_show(uint16_t counter) {
 	} else if (state == ST_LOCO_STOLEN) {
 		_show_loco_direction_blinking(counter);
 	} else if (state == ST_LOCO_RELEASED) {
-		_show_loco_released(counter);
+		_show_blinking(counter);
 	}
 
-	_show_red_led(counter);
+	if (state == ST_LOCO_MINE || state == ST_LOCO_STOLEN)
+		_show_red_led(counter);
 }
 
 static inline void _show_blinking(uint16_t counter) {
