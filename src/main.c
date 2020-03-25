@@ -7,7 +7,7 @@
 #include "hardware.h"
 #include "buttons.h"
 #include "encoder.h"
-#include "lib/uart.h"
+#include "lib/xpressnet.h"
 #include "state.h"
 #include "common.h"
 

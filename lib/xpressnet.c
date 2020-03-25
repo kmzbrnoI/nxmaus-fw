@@ -5,7 +5,7 @@
 #define BAUD 62500
 #include <util/setbaud.h>
 
-#include "uart.h"
+#include "xpressnet.h"
 #include "../src/hardware.h"
 
 uint8_t uart_output_buf[UART_OUTPUT_BUF_MAX_SIZE];

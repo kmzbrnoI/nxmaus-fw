@@ -1,5 +1,5 @@
 #include "common.h"
-#include "lib/uart.h"
+#include "lib/xpressnet.h"
 
 void loco_send_seedir() {
 	if (!uart_can_fill_output_buf())
