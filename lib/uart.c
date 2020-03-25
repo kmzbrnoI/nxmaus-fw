@@ -98,7 +98,7 @@ int uart_send_buf() {
 	if (sending)
 		return 1;
 	waiting_for_send = true;
-	uart_output_buf[uart_output_buf_size-1] = _xor(&uart_output_buf, uart_output_buf_size-1);
+	uart_output_buf[uart_output_buf_size-1] = _xor(uart_output_buf, uart_output_buf_size-1);
 	return 0;
 }
 
