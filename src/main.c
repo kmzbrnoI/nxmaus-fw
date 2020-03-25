@@ -246,7 +246,7 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 	} else if (size == 6 && data[0] == 0xE4) {
 		// Locomotive information normal locomotive
 		loco.free = (data[1] >> 3) & 0x01;
-		uint8_t step_mode = data[1] & 0x03;
+		uint8_t step_mode = data[1] & 0x07;
 		loco.step_mode = STEPS_28;
 		loco.forward = data[2] >> 7;
 		loco.fa = data[3];
@@ -270,7 +270,10 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 				steps = 0;
 			else
 				steps--;
-			loco.steps = (steps / 4.57);
+			if (steps > 0)
+				loco.steps = (steps / 4.57)+1;
+			else
+				loco.steps = 0;
 		} else
 			loco.steps = 0;
 
