@@ -33,6 +33,11 @@ Text editor + `make`. No more, no less.
 
  * Jan Horacek ([jan.horacek@kmz-brno.cz](mailto:jan.horacek@kmz-brno.cz))
 
+## Resources
+
+ * [NXmaus hardware](https://github.com/kmzbrnoI/nxmaus-hw)
+ * [XpressNET protocol](https://dccwiki.com/XpressNet_Protocol)
+
 ## License
 
 This application is released under the [Apache License v2.0
