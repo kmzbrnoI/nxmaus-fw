@@ -44,21 +44,22 @@ void uart_send_loco_status_ask();
 
 int main() {
 	init();
-
-	while (true) {
-	}
+	while (true) {}
 }
 
 void init() {
 	leds_init();
+
 	buttons_init();
 	btn_on_pressed = button_pressed;
+
 	uart_init(25);
 	uart_on_receive = uart_received;
 	uart_on_addressed = uart_addressed;
 	uart_on_addressed_stopped = uart_addressed_stopped;
 	uart_on_addr_changed = uart_addr_changed;
 	uart_on_sniff = uart_sniffed;
+
 	encoder_init();
 	encoder_on_change = encoder_changed;
 
@@ -104,9 +105,9 @@ void eeprom_init() {
 ///////////////////////////////////////////////////////////////////////////////
 
 ISR(TIMER0_COMPA_vect) {
+	// Timer0 on 1 ms
 	static uint16_t counter = 0;
 
-	// Timer0 on 1 ms
 	btn_update();
 	encoder_update();
 	uart_update();
@@ -200,7 +201,6 @@ void uart_addressed() {
 
 void uart_addressed_stopped() {
 	state = ST_XN_UNADDRESSED;
-	// TODO
 }
 
 void uart_addr_changed(uint8_t new_addr) {
@@ -216,15 +216,13 @@ void uart_received(uint8_t recipient, uint8_t *data, uint8_t size) {
 
 void uart_broadcast_received(uint8_t *data, uint8_t size) {
 	if ((size == 3) && (data[0] == 0x61)) {
+		// DCC on/off/service
 		if (data[1] == 0x01) {
 			cs_status = CS_STATUS_ON;
-			led_red_off();
 		} else if (data[1] == 0x00) {
 			cs_status = CS_STATUS_OFF;
-			led_red_on();
 		} else if (data[1] == 0x02) {
 			cs_status = CS_STATUS_SERVICE;
-			led_red_on();
 		}
 	}
 }
@@ -247,7 +245,7 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 		// Locomotive information normal locomotive
 		loco.free = (data[1] >> 3) & 0x01;
 		uint8_t step_mode = data[1] & 0x07;
-		loco.step_mode = STEPS_28;
+		loco.step_mode = STEPS_28; // always 28 steps
 		loco.forward = data[2] >> 7;
 		loco.fa = data[3];
 		loco.fb = data[4];
@@ -291,7 +289,7 @@ void uart_for_me_received(uint8_t *data, uint8_t size) {
 		}
 	} else if ((size == 5) && (data[0] == 0xE3) && (data[1] == 0x40) &&
 	           (data[2] == loco_addr_hi()) && (data[3] == loco_addr_lo())) {
-		// Out locomotive is being operated by another device
+		// Our locomotive is being operated by another device
 		if (state == ST_LOCO_MINE)
 			state = ST_LOCO_STOLEN;
 	}
