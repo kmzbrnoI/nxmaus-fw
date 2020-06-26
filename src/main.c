@@ -230,7 +230,7 @@ void uart_broadcast_received(uint8_t *data, uint8_t size) {
 void uart_for_me_received(uint8_t *data, uint8_t size) {
 	if (size == 4 && data[0] == 0x62 && data[1] == 0x22) {
 		// Command station status indication response
-		if (data[2] & 0x01)
+		if (data[2] & 0x03)
 			cs_status = CS_STATUS_OFF;
 		else if (data[2] & 0x08)
 			cs_status = CS_STATUS_SERVICE;
