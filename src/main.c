@@ -119,8 +119,8 @@ ISR(TIMER0_COMPA_vect) {
 }
 
 void button_pressed(uint8_t button) {
-	if ((button == BTN_TL1) && (uart_can_fill_output_buf()) && (!btn_pressed[BTN_TL4])) {
-		// TL1 for DCC on/off
+	if ((button == BTN_STOP) && (uart_can_fill_output_buf()) && (!btn_pressed[BTN_SHIFT])) {
+		// TL3 for DCC on/off
 
 		if (cs_status == CS_STATUS_OFF) {
 			led_gr_left_toggle();
@@ -135,7 +135,7 @@ void button_pressed(uint8_t button) {
 	}
 
 	if ((state == ST_LOCO_MINE) || (state == ST_LOCO_STOLEN)) {
-		if (button == BTN_INC && !btn_pressed[BTN_TL4]) {
+		if (button == BTN_INC && !btn_pressed[BTN_SHIFT]) {
 			if (loco.steps > 0) {
 				loco.steps = 0;
 				loco.steps_buf = 0;
@@ -147,42 +147,42 @@ void button_pressed(uint8_t button) {
 				state = ST_LOCO_MINE;
 
 			loco_send_seedir();
-		} else if (button == BTN_TL2) {
-			if (btn_pressed[BTN_TL4])
+		} else if (button == BTN_F0) {
+			if (btn_pressed[BTN_SHIFT])
 				loco.fa ^= 0x08;
 			else
 				loco.fa ^= 0x10;
 			loco_send_fa();
-		} else if (button == BTN_TL3) {
-			if (btn_pressed[BTN_TL4]) {
+		} else if (button == BTN_F1) {
+			if (btn_pressed[BTN_SHIFT]) {
 				loco.fb ^= 0x01;
 				loco_send_fb_58();
 			} else {
 				loco.fa ^= 0x01;
 				loco_send_fa();
 			}
-		} else if (button == BTN_TL5) {
-			if (btn_pressed[BTN_TL4]) {
+		} else if (button == BTN_F2) {
+			if (btn_pressed[BTN_SHIFT]) {
 				loco.fb ^= 0x02;
 				loco_send_fb_58();
 			} else {
 				loco.fa ^= 0x02;
 				loco_send_fa();
 			}
-		} else if (button == BTN_TL6) {
-			if (btn_pressed[BTN_TL4]) {
+		} else if (button == BTN_F3) {
+			if (btn_pressed[BTN_SHIFT]) {
 				loco.fb ^= 0x04;
 				loco_send_fb_58();
 			} else {
 				loco.fa ^= 0x04;
 				loco_send_fa();
 			}
-		} else if (button == BTN_TL1 && btn_pressed[BTN_TL4] && last_loco_defined() && last_loco != loco.addr) {
+		} else if (button == BTN_STOP && btn_pressed[BTN_SHIFT] && last_loco_defined() && last_loco != loco.addr) {
 			// Loco acquire
 			state = ST_LOCO_RELEASED;
 			loco.addr = last_loco;
 			last_loco = 0xFFFF;
-		} else if (button == BTN_INC && btn_pressed[BTN_TL4]) {
+		} else if (button == BTN_INC && btn_pressed[BTN_SHIFT]) {
 			loco.steps = 0;
 			loco.steps_buf = 0;
 			loco_send_emergency_stop();
