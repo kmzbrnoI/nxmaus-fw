@@ -19,7 +19,7 @@ void encoder_update() {
 	if (encoder_raw_a()) {
 		if (a_counter < ENCODER_THRESHOLD) {
 			a_counter++;
-			if (a_counter == ENCODER_THRESHOLD) {
+			if ((a_counter == ENCODER_THRESHOLD) && (!a_pressed)) {
 				a_pressed = true;
 				_a_pressed();
 			}
@@ -27,7 +27,7 @@ void encoder_update() {
 	} else {
 		if (a_counter > 0) {
 			a_counter--;
-			if (a_counter == 0) {
+			if ((a_counter == 0) && (a_pressed)) {
 				a_pressed = false;
 				_a_depressed();
 			}

@@ -17,7 +17,7 @@ void btn_update() {
 		if (state & 0x01) {
 			if (btn_counter[i] > 0) {
 				btn_counter[i]--;
-				if (btn_counter[i] == 0) {
+				if ((btn_counter[i]) == 0 && (btn_pressed[i])) {
 					btn_pressed[i] = false;
 					if (btn_on_depressed != NULL)
 						btn_on_depressed(i);
@@ -26,7 +26,7 @@ void btn_update() {
 		} else {
 			if (btn_counter[i] < BTN_THRESHOLD) {
 				btn_counter[i]++;
-				if (btn_counter[i] == BTN_THRESHOLD) {
+				if ((btn_counter[i] == BTN_THRESHOLD) && (!btn_pressed[i])) {
 					btn_pressed[i] = true;
 					if (btn_on_pressed != NULL)
 						btn_on_pressed(i);

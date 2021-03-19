@@ -7,7 +7,7 @@
 #define EEPROM_LOC_LOCO_ADDR 0x00
 #define EEPROM_LOC_SW_VERSION 0x02
 #define EEPROM_LOC_XN_ADDR 0x04
-#define SW_VERSION 0x0101
+#define SW_VERSION 0x0102
 
 #define STEPS_14 0x00
 #define STEPS_27 0x01
