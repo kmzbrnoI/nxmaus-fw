@@ -9,6 +9,8 @@
 #define EEPROM_LOC_XN_ADDR 0x04
 #define SW_VERSION 0x0102
 
+#define XN_DEFAULT_ADDR 25
+
 #define STEPS_14 0x00
 #define STEPS_27 0x01
 #define STEPS_28 0x02

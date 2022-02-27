@@ -53,7 +53,7 @@ void init() {
 	buttons_init();
 	btn_on_pressed = button_pressed;
 
-	uart_init(25);
+	uart_init(XN_DEFAULT_ADDR);
 	uart_on_receive = uart_received;
 	uart_on_addressed = uart_addressed;
 	uart_on_addressed_stopped = uart_addressed_stopped;
@@ -97,7 +97,7 @@ void eeprom_init() {
 
 	xpressnet_addr = eeprom_read_byte((uint8_t*)EEPROM_LOC_XN_ADDR);
 	if (xpressnet_addr == 0xFF) {
-		xpressnet_addr = 25;
+		xpressnet_addr = XN_DEFAULT_ADDR;
 		eeprom_write_byte((uint8_t*)EEPROM_LOC_XN_ADDR, xpressnet_addr);
 	}
 }
