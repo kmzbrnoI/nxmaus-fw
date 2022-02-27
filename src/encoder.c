@@ -4,7 +4,7 @@
 #include "encoder.h"
 #include "hardware.h"
 
-#define ENCODER_THRESHOLD 10  // 10 ms
+#define ENCODER_THRESHOLD 10  // 1 ms
 
 void (*encoder_on_change)(int8_t val) = NULL;
 

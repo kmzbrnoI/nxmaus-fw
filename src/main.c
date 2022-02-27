@@ -69,6 +69,12 @@ void init() {
 	TIMSK0 |= 1 << OCIE0A; // enable interrupt on compare match A
 	OCR0A = 114; // set compare match A to match 1 ms
 
+	// Setup timer1 on 100 us
+	TCCR1A = 0;
+	TCCR1B = (1 << WGM12) | (1 << CS10); // CTC mode, prescaler 1×
+	TIMSK1 = (1 << OCIE1A); // enable interrupt on compare match A
+	OCR1A = 1474; // set compare match A to match 100 us
+
 	led_gr_left_on();
 	led_gr_right_on();
 	led_red_on();
@@ -109,13 +115,17 @@ ISR(TIMER0_COMPA_vect) {
 	static uint16_t counter = 0;
 
 	btn_update();
-	encoder_update();
 	uart_update();
 	state_show(counter);
 	state_update(counter);
 	steps_send_update(counter);
 
 	counter++;
+}
+
+ISR(TIMER1_COMPA_vect) {
+	// Timer1 on 100 us
+	encoder_update();
 }
 
 void button_pressed(uint8_t button) {
